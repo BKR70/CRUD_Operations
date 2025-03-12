@@ -1,4 +1,5 @@
 using CRUD_Operations.Models;
+using CRUD_Operations.Repository;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -10,6 +11,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 var app = builder.Build();
 

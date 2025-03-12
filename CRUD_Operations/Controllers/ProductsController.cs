@@ -1,9 +1,11 @@
 ﻿using CRUD_Operations.Models;
+using CRUD_Operations.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace CRUD_Operations.Controllers
 {
+    /*
     public class ProductsController : Controller
     {
         private readonly AppDbContext _context;
@@ -83,4 +85,91 @@ namespace CRUD_Operations.Controllers
             return RedirectToAction("Index");
         }
     }
+    */
+    public class ProductsController : Controller
+    {
+        private readonly IRepository<Product> _productRepository;
+
+        public ProductsController(IRepository<Product> productRepository)
+        {
+            _productRepository = productRepository;
+        }
+
+        // GET: Products
+        public async Task<IActionResult> Index()
+        {
+            var products = await _productRepository.GetAllAsync();
+            return View(products);
+        }
+
+        // GET: Products/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            var product = await _productRepository.GetByIdAsync(id);
+            if (product == null)
+                return NotFound();
+
+            return View(product);
+        }
+
+        // GET: Products/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Products/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Product product)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(product);
+            }
+
+            await _productRepository.AddAsync(product);
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Products/Edit/5
+        public async Task<IActionResult> Edit(int id)
+        {
+            var product = await _productRepository.GetByIdAsync(id);
+            if (product == null)
+                return NotFound();
+
+            return View(product);
+        }
+
+        // POST: Products/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Product product)
+        {
+            if (id != product.Id)
+                return BadRequest("Product ID mismatch");
+
+            if (!ModelState.IsValid)
+            {
+                return View(product);
+            }
+
+            await _productRepository.UpdateAsync(product);
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Products/Delete/5
+        public async Task<IActionResult> Delete(int id)
+        {
+            var product = await _productRepository.GetByIdAsync(id);
+            if (product == null)
+                return NotFound();
+
+            await _productRepository.DeleteAsync(product);
+            return RedirectToAction(nameof(Index));
+        }
+
+    }
+
 }
